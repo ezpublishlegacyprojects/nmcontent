@@ -1,0 +1,1 @@
+Done! View <a href={"class/classlist/1"|ezurl}>class list</a>.

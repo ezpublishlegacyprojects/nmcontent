@@ -1,0 +1,2 @@
+CONTENT CLASS IMPORT
+* The possibility of putting content classes in specific (new) groups.
