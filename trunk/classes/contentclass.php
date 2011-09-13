@@ -277,6 +277,63 @@ class nmContentClass
 
 		return $actions;
 	}
+
+	function getList()
+	{
+		// prepare result
+		$result = array();
+	
+		// fetch group list
+		$groupList = eZContentClassGroup::fetchList();
+
+		// for each content class group
+		foreach( $groupList as $group )
+		{
+			$groupDetails = array(	'id' 	=> $group->attribute( 'id' ), 
+									'name' 	=> $group->attribute( 'name' ));
+			
+			// fetch classes within group
+		    $classList = eZContentClassClassGroup::fetchClassList( null, $group->attribute( 'id' ) );
+		    
+		    // prepare class result list
+		    $classResultList = array();
+		    
+		    // for each class
+		    foreach( $classList as $class )
+		    {
+		    	$classDetails = array(	'id' 			=> $class->attribute( 'id' ), 
+		    							'identifier'	=> $class->attribute( 'identifier' ), 
+		    							'name'			=> $class->attribute( 'name' ));
+		    
+				// get class data map
+		        $dataMap = $class->attribute( 'data_map' );
+		        
+		        // prepare attribute list
+		        $attributeList = array();
+		        
+		        // for each attribute
+		        foreach( $dataMap as $identifier => $attribute )
+		        {
+		        	$attributeDetails = array(	'id' 			=> $attribute->attribute( 'id' ), 
+		        								'identifier'	=> $attribute->attribute( 'identifier' ), 
+		        								'name'			=> $attribute->attribute( 'name' ), 
+		        								'type'			=> $attribute->attribute( 'data_type_string' ), 
+		        								'is_required'	=> $attribute->attribute( 'is_required' ));
+		        	
+		        	// add to attribute list
+		        	$attributeList[] = $attributeDetails;
+		        }
+		        
+		        $classResultList[] = array(	'details' 		=> $classDetails, 
+		        							'attributes'	=> $attributeList);
+		    }
+		    
+		    $result[] = array(	'details' 		=> $groupDetails, 
+		    					'class_list'	=> $classResultList);
+		}
+		
+		return $result;
+	}
 }
 
 ?>

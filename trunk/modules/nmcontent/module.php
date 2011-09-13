@@ -13,5 +13,9 @@ $ViewList['structureimport'] = array(
     'script' => 'structureimport.php',
     );
 
+$ViewList['classlist'] = array(
+    'script' => 'classlist.php',
+    );
+
 
 ?>
