@@ -318,6 +318,7 @@ class nmContentClass
 		        								'identifier'	=> $attribute->attribute( 'identifier' ), 
 		        								'name'			=> $attribute->attribute( 'name' ), 
 		        								'type'			=> $attribute->attribute( 'data_type_string' ), 
+		        								'type_name'		=> $attribute->dataType()->Name, 
 		        								'is_required'	=> $attribute->attribute( 'is_required' ));
 		        	
 		        	// add to attribute list
