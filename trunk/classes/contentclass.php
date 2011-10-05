@@ -242,6 +242,7 @@ class nmContentClass
 	    $attrParams = array();
 	    $attrParams['identifier'] 		= $attributeData['identifier'];
 	    $attrParams['name'] 			= $attributeData['name'];
+	    $attrParams['description'] 		= $attributeData['desc'];
 	    $attrParams['is_searchable'] 	= 1;
 	        
 	    if(isset($attributeData['required']) and $attributeData['required'] == 1)
