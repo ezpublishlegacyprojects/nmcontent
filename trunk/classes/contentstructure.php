@@ -164,15 +164,22 @@ class nmContentStructure
 															$parentNodeID, 
 															$item['label']);
 						
-						$newNodeID = $contentObject->attribute('main_node_id');
+						if($contentObject)
+						{
+							$newNodeID = $contentObject->attribute('main_node_id');	
+						}
 					}
 				}
 				
 				// if the item has children
 				if(isset($item['children']) and is_array($item['children']) and count($item['children']) > 0)
 				{
-					// repeat the process for the children
-					$this->importStructure($newNodeID, $item['children']);
+					// if we have a parent node to store them under
+					if(isset($newNodeID) and $newNodeID > 0)
+					{
+						// repeat the process for the children
+						$this->importStructure($newNodeID, $item['children']);	
+					}
 				}
 			}
 		}
@@ -182,11 +189,14 @@ class nmContentStructure
 	{
 		$attributeIdentifier = $this->getTitleAttributeIdentifier($contentObject->attribute('class_identifier'));	
 		
-		$attributeList = array( $attributeIdentifier  => $name);
-		$params = array();
-		$params['attributes'] = $attributeList;
-		
-		$result = eZContentFunctions::updateAndPublishObject( $contentObject, $params );
+		if($attributeIdentifier)
+		{
+			$attributeList = array( $attributeIdentifier  => $name);
+			$params = array();
+			$params['attributes'] = $attributeList;
+			
+			$result = eZContentFunctions::updateAndPublishObject( $contentObject, $params );	
+		}
 	}
 	
 	function getTitleAttributeIdentifier($classIdentifier)
@@ -196,8 +206,17 @@ class nmContentStructure
 		// name pattern, but it's close enough for now
 		$contentClass 			= $this->getClass($classIdentifier);
 		$dataMap 				= $contentClass->dataMap();
-		$attribute 				= array_shift($dataMap);
-		return $attribute->attribute('identifier');
+
+		if(!$dataMap)
+		{
+			eZDebug::writeError('The class with the identifier $classIdentifier appears to be missing attributes.');
+			return false;
+		}
+		else
+		{
+			$attribute 				= array_shift($dataMap);
+			return $attribute->attribute('identifier');	
+		}
 	}
 	
 	function createNode($contentClass, $parentNodeID, $name)
@@ -211,13 +230,16 @@ class nmContentStructure
 		// get attribute identifier
 		$attributeIdentifier = $this->getTitleAttributeIdentifier($contentClass->attribute('identifier'));
 	
-		//setting attribute values
-		$attributesData = array ( ) ;
-		$attributesData[$attributeIdentifier] = $name; 
-		$params['attributes'] = $attributesData;
-			 
-		//publishing the content:
-		return eZContentFunctions::createAndPublishObject( $params );
+		if($attributeIdentifier)
+		{
+			//setting attribute values
+			$attributesData = array ( ) ;
+			$attributesData[$attributeIdentifier] = $name; 
+			$params['attributes'] = $attributesData;
+				 
+			//publishing the content:
+			return eZContentFunctions::createAndPublishObject( $params );	
+		}
 	}
 	
 	
