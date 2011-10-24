@@ -95,7 +95,7 @@ class nmContentStructure
 	        
 	        // split label into parts
 	        $labelPieces 	= explode('(', $label);
-	        $label 			= trim($labelPieces[0]);
+	        $label 			= trim(html_entity_decode($labelPieces[0], ENT_NOQUOTES, 'UTF-8'));
 	        $class 			= trim(str_replace(')', '', $labelPieces[1]));
 	        
 	        $item = array(	'label' 	=> $label, 
