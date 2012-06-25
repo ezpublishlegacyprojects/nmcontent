@@ -44,11 +44,51 @@ class nmContentClass
 		
 		return $this->msgList;
 	}
+
+	function updateClassGroups($data)
+	{
+		$validGroups = array();
+		$createGroups = array();
+		$groupList = eZContentClassGroup::fetchList();
+
+		foreach($data['class_list'] as $k => $classData)
+		{
+			foreach($groupList as $group)
+			{
+				if($group->Name != $classData['class_group'] && !in_array($group->Name,$validGroups))
+				{
+					$validGroups[] = $group->Name;
+				}
+			}
+		}
+
+		foreach($data['class_list'] as $k => $classData)
+		{
+			if(!in_array($classData['class_group'],$validGroups) && !in_array($classData['class_group'],$createGroups))
+			{
+				$createGroups[] = $classData['class_group'];
+			}
+		}
+
+		foreach($createGroups as $groupName)
+		{
+			$user = eZUser::currentUser();
+		    $user_id = $user->attribute( "contentobject_id" );
+		    $classgroup = eZContentClassGroup::create( $user_id );
+		    $classgroup->setAttribute( "name", $groupName );
+		    $classgroup->store();
+		}
+	}
 	
 	function updateClasses($data, $commit=true)
 	{
 		$log = array();
 		
+		if($commit)
+		{
+			$this->updateClassGroups($data);
+		}
+
 		// for each class
 		foreach($data['class_list'] as $k => $classData)
 		{
@@ -70,6 +110,9 @@ class nmContentClass
 				// get class version
 				$classVersionID = $classObject->attribute('version');
 				
+				// get class group
+				// $classGroupID = $classObject->attribute( 'group' );
+
 				// get the language of current class which is always available
 				$lang 			= $classObject->alwaysAvailableLanguage();
 				$languageLocale = $lang->Locale;
@@ -167,6 +210,7 @@ class nmContentClass
 			}
 			else
 			{
+
 				$this->addClassStatus(	$classData['class_identifier'], 
 										$classData['class_name'], 
 										false);
@@ -188,9 +232,11 @@ class nmContentClass
 				    // get class attributes
 				    $classID 		= $class->attribute( 'id' );
 				    $ClassVersion 	= $class->attribute( 'version' );
-				    
+				    $groupName 		= (isset($classData['class_group'])) ? $classData['class_group'] : 'Content';
+				    $groupObject 	= eZContentClassGroup::fetchByName($groupName);
+
 				    // store class in group
-				    $ingroup =& eZContentClassClassGroup::create( $classID, $ClassVersion, 1, 'Content' );
+				    $ingroup =& eZContentClassClassGroup::create( $classID, $ClassVersion, $groupObject->attribute('id'), $groupObject->attribute('name') );
 				    $ingroup->store();	
 				}
 				
